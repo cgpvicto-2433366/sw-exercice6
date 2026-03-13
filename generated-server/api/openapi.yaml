@@ -1,0 +1,486 @@
+openapi: 3.1.0
+info:
+  title: Ben Schalom Exercice4
+  version: 1.0.0
+servers:
+- description: Serveur de développement
+  url: http://localhost:3000/api/pokemons
+paths:
+  /{id}:
+    delete:
+      operationId: idDELETE
+      parameters:
+      - description: Identifiant du pokemon à supprimer
+        explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          example: 1
+          format: int32
+          type: integer
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/__id__delete_200_response"
+          description: Suppression réussie
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/__id__put_404_response"
+          description: Id non trouvé
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/__id__delete_500_response"
+          description: Erreur serveur lors de la suppression
+      summary: Supprimer un pokemon de la base de données
+      tags:
+      - Pokemon
+      x-eov-operation-handler: controllers/PokemonController
+    get:
+      operationId: idGET
+      parameters:
+      - description: Identifiant du pockemon dans la base de donnée
+        explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          format: int32
+          type: integer
+          exemple: 1
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/__id__get_200_response"
+          description: Pockémon trouvé avec succès
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/__id__get_404_response"
+          description: Pokemon introuvable
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/__id__get_500_response"
+          description: erreur serveur
+      summary: Recuperer les informations sur un pokemon en fonction de son id
+      tags:
+      - Pokemon
+      x-eov-operation-handler: controllers/PokemonController
+    put:
+      operationId: idPUT
+      parameters:
+      - description: Identifiant du pokemon à modifier
+        explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          example: 1
+          format: int32
+          type: integer
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/__id__put_request"
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/__id__put_200_response"
+          description: Modification réussie
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/__id__put_400_response"
+          description: Format de données invalide
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/__id__put_404_response"
+          description: Pokemon inexistant
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/__id__put_500_response"
+          description: Erreur serveur lors de la modification
+      summary: Modifier un pokemon existant en fonction de son id
+      tags:
+      - Pokemon
+      x-eov-operation-handler: controllers/PokemonController
+  /liste:
+    get:
+      operationId: listeGET
+      parameters:
+      - description: Numéro de la page a retourné
+        explode: true
+        in: query
+        name: page
+        required: false
+        schema:
+          format: int32
+          type: integer
+          exemple: 1
+        style: form
+      - description: Type de pokémon a retourner
+        explode: true
+        in: query
+        name: type
+        required: false
+        schema:
+          type: string
+          exemple: Grass
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/_liste_get_200_response"
+          description: Liste de pockemon trouvé
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/_liste_get_404_response"
+          description: "Pokemon introuvable, mauvais type"
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/_liste_get_500_response"
+          description: erreur serveur
+      summary: "Recuperer la liste de pokemon en groupe de 25, selon un type ou non"
+      tags:
+      - Liste pokemons
+      x-eov-operation-handler: controllers/ListePokemonsController
+  /:
+    post:
+      operationId: rootPOST
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/__post_request"
+        required: true
+      responses:
+        "201":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/__post_201_response"
+          description: Confirmation de creation pokemon
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/__id__put_400_response"
+          description: Il manque des champs
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/__post_500_response"
+          description: erreur serveur
+      summary: Ajouter un pokemon dans la bd
+      tags:
+      - Enregister un pokemon
+      x-eov-operation-handler: controllers/EnregisterUnPokemonController
+components:
+  schemas:
+    _liste_get_404_response:
+      example:
+        pokemons:
+        - ""
+        - ""
+        totalPage: 1
+        nombrePokemonTotal: 0
+        page: 1
+        type: Poisson
+      properties:
+        pokemons:
+          items: {}
+          type: array
+        type:
+          example: Poisson
+          type: string
+        nombrePokemonTotal:
+          example: 0
+          format: int32
+          type: integer
+        page:
+          example: 1
+          format: int32
+          type: integer
+        totalPage:
+          example: 1
+          format: int32
+          type: integer
+    _liste_get_200_response_pokemons_inner:
+      example:
+        type_primaire: Grass
+        type_secondaire: Poisson
+        defense: 1
+        pv: 6
+        id: 0
+        nom: Bulbasaur
+        attaque: 5
+      properties:
+        id:
+          type: integer
+          exemple: 1
+        nom:
+          example: Bulbasaur
+          type: string
+        type_primaire:
+          example: Grass
+          type: string
+        type_secondaire:
+          example: Poisson
+          type: string
+        pv:
+          type: integer
+          exemple: 45
+        defense:
+          type: integer
+          exemple: 49
+        attaque:
+          type: integer
+          exemple: 49
+    __id__get_200_response:
+      example:
+        type_primaire: Grass
+        type_secondaire: Poisson
+        defense: 6
+        pv: 0
+        nom: Bulbasaur
+        attaque: 1
+      properties:
+        nom:
+          example: Bulbasaur
+          type: string
+        type_primaire:
+          example: Grass
+          type: string
+        type_secondaire:
+          example: Poisson
+          type: string
+        pv:
+          type: integer
+          exemple: 45
+        defense:
+          type: integer
+          exemple: 49
+        attaque:
+          type: integer
+          exemple: 49
+    __id__get_500_response:
+      example:
+        erreur: Echec lors de la récupération du pokemon avec l'id 6
+      properties:
+        erreur:
+          example: Echec lors de la récupération du pokemon avec l'id 6
+          type: string
+    __id__put_404_response:
+      example:
+        erreur: Le pokemon id 1 n'existe pas dans la base de données
+      properties:
+        erreur:
+          example: Le pokemon id 1 n'existe pas dans la base de données
+          type: string
+    __id__delete_500_response:
+      example:
+        erreur: Echec lors de la suppression du pokemon Bulbasaur
+      properties:
+        erreur:
+          example: Echec lors de la suppression du pokemon Bulbasaur
+          type: string
+    _liste_get_200_response:
+      example:
+        pokemons:
+        - type_primaire: Grass
+          type_secondaire: Poisson
+          defense: 1
+          pv: 6
+          id: 0
+          nom: Bulbasaur
+          attaque: 5
+        - type_primaire: Grass
+          type_secondaire: Poisson
+          defense: 1
+          pv: 6
+          id: 0
+          nom: Bulbasaur
+          attaque: 5
+        totalPage: 3
+        nombrePokemonTotal: 2
+        page: 3
+        type: Poisson
+      properties:
+        pokemons:
+          items:
+            $ref: "#/components/schemas/_liste_get_200_response_pokemons_inner"
+          type: array
+        type:
+          example: Poisson
+          type: string
+        nombrePokemonTotal:
+          example: 2
+          format: int32
+          type: integer
+        page:
+          example: 3
+          format: int32
+          type: integer
+        totalPage:
+          example: 3
+          format: int32
+          type: integer
+    __post_500_response:
+      example:
+        erreur: Echec lors de la création
+      properties:
+        erreur:
+          example: Echec lors de la création
+          type: string
+    __id__get_404_response:
+      example:
+        erreur: Pokemon introuvable avec l'id 124
+      properties:
+        erreur:
+          example: Pokemon introuvable avec l'id 124
+          type: string
+    __id__put_200_response:
+      example:
+        message: Le pokemon id 1 a été modifié avec succès
+      properties:
+        message:
+          example: Le pokemon id 1 a été modifié avec succès
+          type: string
+    __id__put_request:
+      properties:
+        nom:
+          example: Bulbasaur
+          type: string
+        type_primaire:
+          example: Grass
+          type: string
+        type_secondaire:
+          example: Poison
+          type: string
+        pv:
+          example: 45
+          type: integer
+        attaque:
+          example: 49
+          type: integer
+        defense:
+          example: 49
+          type: integer
+    _liste_get_500_response:
+      example:
+        erreur: Echec lors de la récupération de la liste des pokemons
+      properties:
+        erreur:
+          example: Echec lors de la récupération de la liste des pokemons
+          type: string
+    __post_201_response_pokemons_inner:
+      example:
+        id: 1
+        nom: Bulbasaur
+      properties:
+        id:
+          example: 1
+          type: integer
+        nom:
+          example: Bulbasaur
+          type: string
+    __id__put_500_response:
+      example:
+        erreur: Echec lors de la modification du pokemon Bulbasaur
+      properties:
+        erreur:
+          example: Echec lors de la modification du pokemon Bulbasaur
+          type: string
+    __post_201_response:
+      example:
+        pokemons:
+        - id: 1
+          nom: Bulbasaur
+        - id: 1
+          nom: Bulbasaur
+        message: Le pokemon Bulbasaur a été ajouté avec succès
+      properties:
+        pokemons:
+          items:
+            $ref: "#/components/schemas/__post_201_response_pokemons_inner"
+          type: array
+        message:
+          example: Le pokemon Bulbasaur a été ajouté avec succès
+          type: string
+    __id__put_400_response:
+      example:
+        champs_manquants:
+        - pv
+        - attaque
+        erreur: Le format des données est invalide
+      properties:
+        erreur:
+          example: Le format des données est invalide
+          type: string
+        champs_manquants:
+          example:
+          - pv
+          - attaque
+          items:
+            type: string
+          type: array
+    __id__delete_200_response:
+      example:
+        message: Le pokemon id 1 a été supprimé avec succès
+      properties:
+        message:
+          example: Le pokemon id 1 a été supprimé avec succès
+          type: string
+    __post_request:
+      properties:
+        id:
+          example: 1
+          type: integer
+        nom:
+          example: Bulbasaur
+          type: string
+        type_primaire:
+          example: Grass
+          type: string
+        type_secondaire:
+          example: Poison
+          type: string
+        pv:
+          example: 45
+          type: integer
+        defense:
+          example: 49
+          type: integer
+        attaque:
+          example: 49
+          type: integer
