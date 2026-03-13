@@ -37,7 +37,8 @@ export const getOnePockemon = async (id) =>{
 
     try{
         const resultat = await pool.query(query, params);
-        return adaptResult(resultat);
+        const rows = adaptResult(resultat);
+        return rows[0];
     } catch(erreur){
         console.log(`Erreur, code: ${erreur.code} sqlState ${erreur.sqlState} : ${erreur.sqlMessage}`);
         throw erreur;

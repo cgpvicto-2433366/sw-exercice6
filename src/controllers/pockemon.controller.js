@@ -84,9 +84,9 @@ export const _getAllPockemon = async (req, res) =>{
         return res.json({
             pokemons: liste,
             type: type,
-            nombrePokemonTotal: total,
+            nombrePokemonTotal: parseInt(total),
             page: page,
-            totalPage: Math.ceil(total / limit)
+            totalPage: Math.ceil(parseInt(total) / limit)
         });
 
     } catch (erreur) {
@@ -165,7 +165,7 @@ export const _addOnePokemon = async (req, res) => {
         res.status(201).json({
             message: "Le pokemon " + nom + " a été ajouté avec succès",
             pokemon: {
-                id: reponse.insertId,
+                id: reponse[0]?.id,
                 nom,
                 type_primaire,
                 type_secondaire,
