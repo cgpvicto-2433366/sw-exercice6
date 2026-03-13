@@ -29,7 +29,7 @@ app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 app.use(express.json())
 app.use(
   OpenApiValidator.middleware({
-    apiSpec: path.join(__dirname, './documentation.json'), // fichier de dcumentation OpenAPI
+    apiSpec: path.join(__dirname, './src/config/documentation.json'), // fichier de dcumentation OpenAPI
     validateRequests: true,
     validateResponses: true
   })
