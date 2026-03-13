@@ -1,4 +1,5 @@
 import pool from '../config/db.js'
+import { adaptQuery, adaptResult } from '../config/queryadapters.js'
 
 /**
  * Methode pour recuperer un pockemon dans la bd a partir 
@@ -32,12 +33,11 @@ import pool from '../config/db.js'
  * @param {} id // L'identifiant du pokemon à récupérer
  */
 export const getOnePockemon = async (id) =>{
-    const requete = 'SELECT nom, type_primaire, type_secondaire, pv, attaque, defense FROM pokemon where id =?'
-    const param = [id]
+    const { query, params } = adaptQuery('SELECT nom, type_primaire, type_secondaire, pv, attaque, defense FROM pokemon where id =?', [id]);
 
     try{
-        const [resultat] = await pool.query(requete, param);
-        return resultat[0] ?? null;
+        const resultat = await pool.query(query, params);
+        return adaptResult(resultat);
     } catch(erreur){
         console.log(`Erreur, code: ${erreur.code} sqlState ${erreur.sqlState} : ${erreur.sqlMessage}`);
         throw erreur;
@@ -55,25 +55,28 @@ export const getOnePockemon = async (id) =>{
  */
 export const getAllPokemons =  async(offset, limit, type) =>{
 
-    let requete
-    let params
+    let sqlQuery;
+    let sqlParams;
 
     if(type ===""){
-        requete = `SELECT id, nom, type_primaire, type_secondaire, pv, attaque, defense, 
-                (SELECT COUNT(*) FROM pokemon) AS nombrePokemonTotal
-                FROM pokemon LIMIT ? OFFSET ?`
-        params = [limit, offset]
+        sqlQuery = `SELECT id, nom, type_primaire, type_secondaire, pv, attaque, defense, 
+                (SELECT COUNT(*) FROM pokemon) AS "nombrePokemonTotal"
+                FROM pokemon LIMIT ? OFFSET ?`;
+        sqlParams = [limit, offset];
     }else {
-        requete = `SELECT id, nom, type_primaire, type_secondaire, pv, attaque, defense, 
-                    (SELECT COUNT(*) FROM pokemon WHERE type_primaire = ?) AS nombrePokemonTotal
-                    FROM pokemon WHERE type_primaire = ? LIMIT ? OFFSET ?`
-        params = [type, type, limit, offset]
+        sqlQuery = `SELECT id, nom, type_primaire, type_secondaire, pv, attaque, defense, 
+                    (SELECT COUNT(*) FROM pokemon WHERE type_primaire = ?) AS "nombrePokemonTotal"
+                    FROM pokemon WHERE type_primaire = ? LIMIT ? OFFSET ?`;
+        sqlParams = [type, type, limit, offset];
     }
     
+    const { query, params } = adaptQuery(sqlQuery, sqlParams);
+    
     try{
-        const [resultat] = await pool.query(requete, params)
-        const total = resultat.length > 0 ? resultat[0].nombrePokemonTotal: 0
-        return [resultat, total]
+        const resultat = await pool.query(query, params);
+        const adaptedResult = adaptResult(resultat);
+        const total = adaptedResult.length > 0 ? adaptedResult[0].nombrePokemonTotal : 0;
+        return [adaptedResult, total];
     } catch(erreur){
         console.log(`Erreur, code: ${erreur.code} sqlState ${erreur.sqlState} : ${erreur.sqlMessage}`);
         throw erreur;
@@ -92,12 +95,11 @@ export const getAllPokemons =  async(offset, limit, type) =>{
  * @returns 
  */
 export const addOnePokemon =  async(nom, type_primaire, type_secondaire, pv, attaque, defense) =>{
-    const requete =  "INSERT INTO pokemon (nom, type_primaire, type_secondaire, pv, attaque, defense) VALUES (?, ?, ?, ?, ?, ?)"
-    const params = [nom, type_primaire, type_secondaire, pv, attaque, defense]
+    const { query, params } = adaptQuery("INSERT INTO pokemon (nom, type_primaire, type_secondaire, pv, attaque, defense) VALUES (?, ?, ?, ?, ?, ?)", [nom, type_primaire, type_secondaire, pv, attaque, defense]);
 
     try{
-        const [resultat] = await pool.execute(requete, params)
-        return resultat
+        const resultat = await pool.query(query, params);
+        return adaptResult(resultat);
     }catch(erreur){
         console.log(`Erreur, code: ${erreur.code} sqlState ${erreur.sqlState} : ${erreur.sqlMessage}`);
         throw erreur;
@@ -109,14 +111,13 @@ export const addOnePokemon =  async(nom, type_primaire, type_secondaire, pv, att
  * Modifier un pokemon existant
  */
 export const updateOnePokemon = async (id, nom, type_primaire, type_secondaire, pv, attaque, defense) => {
-    const requete = `UPDATE pokemon 
+    const { query, params } = adaptQuery(`UPDATE pokemon 
                      SET nom = ?, type_primaire = ?, type_secondaire = ?, pv = ?, attaque = ?, defense = ? 
-                     WHERE id = ?`;
-    const params = [nom, type_primaire, type_secondaire, pv, attaque, defense, id];
+                     WHERE id = ?`, [nom, type_primaire, type_secondaire, pv, attaque, defense, id]);
 
     try {
-        const [resultat] = await pool.execute(requete, params);
-        return resultat;
+        const resultat = await pool.query(query, params);
+        return adaptResult(resultat);
     } catch (erreur) {
         console.log(`Erreur, code: ${erreur.code} sqlState ${erreur.sqlState} : ${erreur.sqlMessage}`);
         throw erreur;
@@ -127,11 +128,11 @@ export const updateOnePokemon = async (id, nom, type_primaire, type_secondaire, 
  * Supprimer un pokemon
  */
 export const deleteOnePokemon = async (id) => {
-    const requete = "DELETE FROM pokemon WHERE id = ?";
+    const { query, params } = adaptQuery("DELETE FROM pokemon WHERE id = ?", [id]);
     
     try {
-        const [resultat] = await pool.execute(requete, [id]);
-        return resultat;
+        const resultat = await pool.query(query, params);
+        return adaptResult(resultat);
     } catch (erreur) {
         console.log(`Erreur, code: ${erreur.code} sqlState ${erreur.sqlState} : ${erreur.sqlMessage}`);
         throw erreur;
