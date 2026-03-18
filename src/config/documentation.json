@@ -5,7 +5,11 @@
         "version": "1.0.0",
         "summary":"Exercice 4 service web H26"
     },
-    "servers":[
+    "servers": [
+        {
+            "url": "https://sw-exercice6.onrender.com/api/pokemons",
+            "description": "Serveur de production"
+        },
         {
             "url": "http://localhost:3000/api/pokemons",
             "description": "Serveur de développement"
