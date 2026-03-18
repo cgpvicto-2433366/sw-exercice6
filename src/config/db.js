@@ -5,6 +5,8 @@ dotenv.config();
 
 let pool;
 
+const sslConfig = process.env.DB_SSL ? { rejectUnauthorized: false } : false;
+
 if (process.env.USE_MYSQL) {
     pool = mysql.createPool({
         connectionLimit: process.env.DB_CONNECTION_LIMIT,
@@ -19,7 +21,8 @@ if (process.env.USE_MYSQL) {
         user: process.env.DB_USER,
         password: process.env.DB_PASSWORD,
         database: process.env.DB_DATABASE,
-        port: process.env.DB_PORT
+        port: process.env.DB_PORT,
+        ssl: sslConfig
     });
 }
 
