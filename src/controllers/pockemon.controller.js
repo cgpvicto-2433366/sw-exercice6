@@ -39,7 +39,7 @@ export const _getOnePockemon = async (req, res) =>{
  */
 export const _getAllPockemon = async (req, res) =>{
     let page = req.query.page
-    const type = req.query.type || ""
+    const type = (!req.query.type || req.query.type === "null") ? "" : req.query.type
     const limit = 25
 
     //validation du parametre page
