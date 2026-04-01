@@ -43,7 +43,7 @@ export const _getAllPockemon = async (req, res) =>{
     const limit = 25
 
     //validation du parametre page
-    if(page){
+    if(page && req.query.page != "null"){
         if(parseInt(page)>=1){
             page = parseInt(page)
         }
