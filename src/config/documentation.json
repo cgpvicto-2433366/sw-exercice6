@@ -297,7 +297,7 @@
                                         "pokemons": {
                                             "type": "array",
                                             "items":{
-                                                "type":"integer",
+                                                "type":"object",
                                                 "properties":{
                                                     "id":{
                                                         "type":"integer",
