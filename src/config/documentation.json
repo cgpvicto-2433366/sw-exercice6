@@ -272,6 +272,7 @@
                         "schema":{
                             "type": "integer",
                             "format": "int32",
+                            "nullable": true,
                             "exemple": 1
                         }
                     },
@@ -282,6 +283,7 @@
                         "required": false,
                         "schema":{
                             "type": "string",
+                            "nullable": true,
                             "exemple": "Grass"
                         }
                     }
