@@ -28,12 +28,24 @@ const HOST = process.env.HOST;
 app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 app.use(express.json())
 
-// Middleware pour nettoyer les paramètres "null" avant la validation OpenAPI
+// Middleware pour nettoyer les paramètres "null" et valider le type avant la validation OpenAPI
 app.use((req, res, next) => {
-  // Convertir les strings "null" ou "undefined" en undefined dans les query parameters
+  // Nettoyer les paramètres query
   Object.keys(req.query).forEach(key => {
-    if (req.query[key] === 'null' || req.query[key] === 'undefined') {
+    const value = req.query[key];
+    
+    // Supprimer si c'est "null" ou "undefined"
+    if (value === 'null' || value === 'undefined' || value === '') {
       delete req.query[key];
+    }
+    // Pour le paramètre "page", convertir en integer ou supprimer
+    else if (key === 'page') {
+      const pageNum = parseInt(value);
+      if (isNaN(pageNum)) {
+        delete req.query[key];
+      } else {
+        req.query[key] = pageNum;
+      }
     }
   });
   next();
