@@ -27,6 +27,18 @@ const HOST = process.env.HOST;
 
 app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 app.use(express.json())
+
+// Middleware pour nettoyer les paramètres "null" avant la validation OpenAPI
+app.use((req, res, next) => {
+  // Convertir les strings "null" ou "undefined" en undefined dans les query parameters
+  Object.keys(req.query).forEach(key => {
+    if (req.query[key] === 'null' || req.query[key] === 'undefined') {
+      delete req.query[key];
+    }
+  });
+  next();
+});
+
 app.use(
   OpenApiValidator.middleware({
     apiSpec: path.join(__dirname, './src/config/documentation.json'), // fichier de dcumentation OpenAPI
